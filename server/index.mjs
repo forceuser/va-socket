@@ -200,6 +200,10 @@ async function init (nested = false) {
 							describe: "ssl cert for https",
 							type: "string",
 						})
+						.positional("secure-ca", {
+							describe: "ssl ca for https",
+							type: "string",
+						})
 						.positional("backend-url", {
 							alias: ["b"],
 							describe: "backend server origin url",
@@ -299,6 +303,10 @@ async function startServer (argv) {
 	if (argv["secure-cert"]) {
 		sslOptions.cert = fs.readFileSync(argv["secure-cert"]);
 		console.log("sslOptions.cert", sslOptions.cert);
+	}
+	if (argv["secure-ca"]) {
+		sslOptions.ca = fs.readFileSync(argv["secure-ca"]);
+		console.log("sslOptions.ca", sslOptions.ca);
 	}
 
 
