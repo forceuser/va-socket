@@ -289,14 +289,15 @@ async function init (nested = false) {
 async function startServer (argv) {
 	logger.log({level: "info", message: `http2 ${argv.http2}`});
 	logger.log({level: "info", message: `https ${argv.https}`});
-	logger.log({level: "info", message: `trustProxy ${argv.trustProxy}`});
-	logger.log({level: "info", message: `backendUrl ${argv.backendUrl}`});
+	logger.log({level: "info", message: `trustProxy ${argv["trust-proxy"]}`});
+	logger.log({level: "info", message: `backendUrl ${argv["backend-url"]}`});
 
 	const fastify = Fastify(Object.assign({
+		trustProxy: argv["trust-proxy"],
 		http2: argv.http2,
 		https: argv.https ? (argv.secureCert && argv.secureKey ? {
-			key: argv.secureKey,
-			cert: argv.secureCert,
+			key: fs.readFileSync(argv.secureKey),
+			cert: fs.readFileSync(argv.secureCert),
 		} : true) : false,
 	}, {}));
 
