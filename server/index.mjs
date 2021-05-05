@@ -425,7 +425,7 @@ async function startServer (argv) {
 		}
 	});
 
-	fastify.post("/api/users", async (request, reply) => {
+	fastify.get("/api/users", async (request, reply) => {
 		try {
 			// if (!request.cookies.csrfToken || request.cookies.csrfToken !== request.headers["x-csrf-token"]) {
 			// 	reply.code(403).send({errCode: "CSRF_MISSMATCH_ERROR", errText: "CSRF Token Mismatch"});
