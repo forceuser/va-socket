@@ -216,8 +216,8 @@ async function init (nested = false) {
 							type: "boolean",
 							default: true,
 						})
-						.positional("http-port", {
-							alias: ["p", "port"],
+						.positional("port", {
+							alias: ["p", "http-port"],
 							describe: "server port",
 							type: "number",
 							default: 80,
@@ -316,12 +316,12 @@ async function startServer (argv) {
 	const fastify = Fastify(Object.assign({
 		trustProxy: argv["trust-proxy"],
 		http2: argv.http2,
-		https: argv.https || argv.http2 ? sslOptions : false,
+		https: (argv.https || argv.http2) ? sslOptions : false,
 	}, {}));
 
 	if (argv.https || argv.http2) {
 		fastify.register(FastifyHttpsRedirect, {
-			httpPort: argv["http-port"],
+			httpPort: argv.port,
 		});
 	}
 
@@ -415,6 +415,7 @@ async function startServer (argv) {
 			reply.code(500).send();
 		}
 	});
+
 	fastify.get("/health", async (request, reply) => {
 		if (health.error) { // fail
 			reply.code(500).headers({"content-type": "application/json"}).send(toJson(health));
@@ -470,6 +471,7 @@ async function startServer (argv) {
 		// 	response.setHeader("x-content-type-options", "nosniff");
 		// }
 	});
+
 	if (argv["letsencrypt-dir"]) {
 		logger.log({level: "info", message: `path: ${path.join(argv["letsencrypt-dir"], "/.well-known/acme-challenge")}`});
 		fastify.register(FastifyStatic, {
@@ -487,7 +489,7 @@ async function startServer (argv) {
 	}
 	fastify.register(FastifyCookie);
 
-	const port = (argv.https || argv.https2) ? argv["https-port"] || argv.port : argv.port;
+	const port = (argv.https || argv.http2) ? (argv["https-port"] || argv.port) : argv.port;
 	const host = argv.host;
 	try {
 		fastify.listen(port, host, (error, address) => {
