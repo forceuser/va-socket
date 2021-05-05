@@ -291,14 +291,21 @@ async function startServer (argv) {
 	logger.log({level: "info", message: `https ${argv.https}`});
 	logger.log({level: "info", message: `trustProxy ${argv["trust-proxy"]}`});
 	logger.log({level: "info", message: `backendUrl ${argv["backend-url"]}`});
+	const sslOptions = {};
+	if (argv["secure-key"]) {
+		sslOptions.key = fs.readFileSync(argv["secure-key"]);
+		console.log("sslOptions.key", sslOptions.key);
+	}
+	if (argv["secure-cert"]) {
+		sslOptions.cert = fs.readFileSync(argv["secure-cert"]);
+		console.log("sslOptions.cert", sslOptions.cert);
+	}
+
 
 	const fastify = Fastify(Object.assign({
 		trustProxy: argv["trust-proxy"],
 		http2: argv.http2,
-		https: argv.https ? (argv.secureCert && argv.secureKey ? {
-			key: fs.readFileSync(argv.secureKey),
-			cert: fs.readFileSync(argv.secureCert),
-		} : true) : false,
+		https: argv.https ? sslOptions : false,
 	}, {}));
 
 	const indexTemplate = await fs.readFile(path.join(serverDir, "templates/index.mustache"), "utf8");
