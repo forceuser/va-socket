@@ -1,6 +1,6 @@
 {
   "name": "va-socket",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "server/index.mjs",
   "repository": {
@@ -23,6 +23,7 @@
     "dotenv-expand": "^5.1.0",
     "fastify": "^3.15.0",
     "fastify-cookie": "^5.3.0",
+    "fastify-https-redirect": "^1.0.3",
     "fastify-static": "^4.0.1",
     "fs-extra": "^9.1.0",
     "globby": "^11.0.3",

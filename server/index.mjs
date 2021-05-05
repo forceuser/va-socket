@@ -14,6 +14,7 @@ import {fileURLToPath} from "url";
 import Fastify from "fastify";
 import FastifyStatic from "fastify-static";
 import FastifyCookie from "fastify-cookie";
+import FastifyHttpsRedirect from "fastify-https-redirect";
 import fetch from "node-fetch";
 import logger from "./logger.mjs";
 import $yaml from "yaml";
@@ -215,11 +216,16 @@ async function init (nested = false) {
 							type: "boolean",
 							default: true,
 						})
-						.positional("port", {
-							alias: ["p"],
+						.positional("http-port", {
+							alias: ["p", "port"],
 							describe: "server port",
 							type: "number",
-							default: 3000,
+							default: 80,
+						})
+						.positional("https-port", {
+							describe: "server port",
+							type: "number",
+							default: 443,
 						})
 						.positional("host", {
 							alias: ["h"],
@@ -298,23 +304,26 @@ async function startServer (argv) {
 	const sslOptions = {};
 	if (argv["secure-key"]) {
 		sslOptions.key = fs.readFileSync(argv["secure-key"]);
-		console.log("sslOptions.key", sslOptions.key);
 	}
 	if (argv["secure-cert"]) {
 		sslOptions.cert = fs.readFileSync(argv["secure-cert"]);
-		console.log("sslOptions.cert", sslOptions.cert);
 	}
 	if (argv["secure-ca"]) {
 		sslOptions.ca = fs.readFileSync(argv["secure-ca"]);
-		console.log("sslOptions.ca", sslOptions.ca);
 	}
 
 
 	const fastify = Fastify(Object.assign({
 		trustProxy: argv["trust-proxy"],
 		http2: argv.http2,
-		https: argv.https ? sslOptions : false,
+		https: argv.https || argv.http2 ? sslOptions : false,
 	}, {}));
+
+	if (argv.https || argv.http2) {
+		fastify.register(FastifyHttpsRedirect, {
+			httpPort: argv["http-port"],
+		});
+	}
 
 	const indexTemplate = await fs.readFile(path.join(serverDir, "templates/index.mustache"), "utf8");
 	Mustache.parse(indexTemplate);
@@ -478,7 +487,7 @@ async function startServer (argv) {
 	}
 	fastify.register(FastifyCookie);
 
-	const port = argv.port;
+	const port = (argv.https || argv.https2) ? argv["https-port"] || argv.port : argv.port;
 	const host = argv.host;
 	try {
 		fastify.listen(port, host, (error, address) => {
