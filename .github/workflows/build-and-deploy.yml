@@ -1,12 +1,14 @@
 name: build-and-deploy
-on: [push]
+on: [push,workflow_dispatch]
 jobs:
   # test:
   #   ...
   deploy:
+    environment:
+        name: prod
     name: "Deploy to forceuser.space"
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     # needs: test
     steps:
       - name: Configure SSH
