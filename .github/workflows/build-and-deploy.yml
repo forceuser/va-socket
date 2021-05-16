@@ -1,0 +1,30 @@
+name: build-and-deploy
+on: [push]
+jobs:
+  # test:
+  #   ...
+  deploy:
+    name: "Deploy to forceuser.space"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # needs: test
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/deploy_server.key
+          chmod 600 ~/.ssh/deploy_server.key
+          cat >>~/.ssh/config <<END
+          Host deploy_server
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/deploy_server.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: Create test file
+        run: ssh deploy_server 'echo "123" >> ~/hehe.txt'
