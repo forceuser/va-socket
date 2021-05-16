@@ -16,13 +16,13 @@ jobs:
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/deploy_server.key
           chmod 600 ~/.ssh/deploy_server.key
-          cat >>~/.ssh/config <<END
+          cat >>~/.ssh/config << EOF
           Host deploy_server
             HostName $SSH_HOST
             User $SSH_USER
             IdentityFile ~/.ssh/deploy_server.key
             StrictHostKeyChecking no
-          END
+          EOF
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
@@ -33,7 +33,9 @@ jobs:
 
       - name: Pull from remote and start
         run: |
-          mkdir -p ~/projects/ >/dev/null 2>$1
-          cd ~/projects/
-          git clone "git@github.com:forceuser/va-socket.git" "forceuser.space" 2> /dev/null || (cd "forceuser.space" ; git pull)
-          docker-compose up -d
+          ssh deploy_server << EOF
+            mkdir -p ~/projects/ >/dev/null 2>&1
+            cd ~/projects/
+            git clone "git@github.com:forceuser/va-socket.git" "forceuser.space" 2> /dev/null || (cd "forceuser.space" ; git pull)
+            docker-compose up -d
+          EOF
