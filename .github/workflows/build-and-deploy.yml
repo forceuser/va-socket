@@ -21,6 +21,8 @@ jobs:
             IdentityFile ~/.ssh/deploy_server.key
             StrictHostKeyChecking no
           END
+		  echo $SSH_USER
+		  cat ~/.ssh/config
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
