@@ -38,5 +38,5 @@ jobs:
             cd ~/projects/
             git clone "https://github.com/forceuser/va-socket.git" "forceuser.space" 2> /dev/null || (cd "forceuser.space" ; git pull)
             cd ~/projects/forceuser.space
-            docker-compose up -d
+            docker-compose up -d --build --force-recreate
           EOF
