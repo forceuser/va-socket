@@ -36,6 +36,7 @@ jobs:
           ssh deploy_server << EOF
             mkdir -p ~/projects/ >/dev/null 2>&1
             cd ~/projects/
-            git clone "git@github.com:forceuser/va-socket.git" "forceuser.space" 2> /dev/null || (cd "forceuser.space" ; git pull)
+            git clone "git@github.com:forceuser/va-socket.git" "forceuser.space"
+            cd ~/projects/forceuser.space
             docker-compose up -d
           EOF
