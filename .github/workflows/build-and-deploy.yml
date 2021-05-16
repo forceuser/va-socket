@@ -23,8 +23,6 @@ jobs:
             IdentityFile ~/.ssh/deploy_server.key
             StrictHostKeyChecking no
           END
-          echo $SSH_USER
-          cat ~/.ssh/config
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
@@ -32,3 +30,10 @@ jobs:
 
       - name: Create test file
         run: ssh deploy_server 'echo "123" >> ~/hehe.txt'
+
+      - name: Pull from remote and start
+        run: |
+          mkdir -p ~/projects/ >/dev/null 2>$1
+          cd ~/projects/
+          git clone "git@github.com:forceuser/va-socket.git" "forceuser.space" 2> /dev/null || (cd "forceuser.space" ; git pull)
+          docker-compose up -d

@@ -491,10 +491,14 @@ async function startServer (argv) {
 
 	const port = (argv.https || argv.http2) ? (argv["https-port"] || argv.port) : argv.port;
 	const host = argv.host;
+
+	logger.log({level: "info", message: `host: ${host}, port: ${port}`});
+
 	try {
 		fastify.listen(port, host, (error, address) => {
 			if (error) {
 				health.error = error;
+				logger.log({level: "info", message: `error: ${toJson(error)}`});
 			}
 			else {
 				health.webServerActive = true;
