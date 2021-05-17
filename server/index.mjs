@@ -383,7 +383,12 @@ async function startServer (argv) {
 			const nonce = crypto.randomBytes(16).toString("base64");
 			const csrfToken = uniq(26);
 			const traceId = uniq(26);
-			const renderedTemplate = Mustache.render(indexTemplate, {nonce, csrfToken, traceId});
+			const renderedTemplate = Mustache.render(indexTemplate, {
+				nonce,
+				csrfToken,
+				traceId,
+				randomX: crypto.randomBytes(16).toString("base64"),
+			});
 			reply
 				.code(200)
 				.cookie("csrfToken", csrfToken, {
